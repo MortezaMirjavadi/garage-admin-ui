@@ -1,0 +1,17 @@
+export const queryKeys = {
+  clusterHealth: ['cluster', 'health'] as const,
+  clusterStatus: ['cluster', 'status'] as const,
+  clusterStatistics: ['cluster', 'statistics'] as const,
+  settings: ['settings'] as const,
+  buckets: ['buckets'] as const,
+  bucket: (id: string) => ['buckets', id] as const,
+  keys: ['keys'] as const,
+  key: (id: string) => ['keys', id] as const,
+  objects: (bucketId: string, prefix: string) => ['objects', bucketId, prefix] as const,
+  clusterLayout: ['cluster', 'layout'] as const,
+  nodeInfo: (id: string) => ['node', id, 'info'] as const,
+  nodeStatistics: (id: string) => ['node', id, 'statistics'] as const,
+  workers: (id: string) => ['node', id, 'workers'] as const,
+  blockErrors: (id: string) => ['node', id, 'block-errors'] as const,
+  adminTokens: ['admin-tokens'] as const,
+}
