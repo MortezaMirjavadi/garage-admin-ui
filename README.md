@@ -1,6 +1,8 @@
 # Garage v2.5.0 — local setup & usage
 
-Single-node Garage (S3-compatible object store) in Docker.
+Single-node Garage (S3-compatible object store) in Docker, with a Flask + React admin UI.
+
+![Garage admin UI — dashboard](docs/dashboard.png)
 
 ## Ports — what each one is
 
@@ -28,13 +30,17 @@ docker rm -f garage-container             # remove (data survives in named volum
 
 ## Credentials
 
-From `.env.garage` / `garage.toml`:
+Secrets are **not committed** — read them from the gitignored files:
 
-- Access key ID: `GK9a14c600d85ff3bf96ce4f0d6d30b115`
-- Secret key:    `6ab0baf787df18f75152bed0e808d9e5d80a43c4e6570fa3c2ec4cef6800ac5f`
-- Bucket:        `default-bucket`
-- S3 endpoint:   `http://127.0.0.1:3900` (path-style, region `garage`)
-- Admin token:   `SKq4EDVBb+PZWnW96iFNwJZBMiP2V8n0tNWhGbjI+I8=`
+- Access key ID → `backend/.env` (`GARAGE_S3_ACCESS_KEY`): `<access-key-id>`
+- Secret key → `backend/.env` (`GARAGE_S3_SECRET_KEY`): `<secret-key>`
+- Admin token → `garage.toml` (`[admin] admin_token`): `<admin-token>`
+- Bucket: `default-bucket`
+- S3 endpoint: `http://127.0.0.1:3900` (path-style, region `garage`)
+
+> ⚠️ If any of these values were ever committed, rotate them: regenerate
+> `admin_token`/`rpc_secret` in `garage.toml` and recreate the S3 access key, then update
+> `backend/.env`.
 
 ## Working with objects
 
@@ -43,8 +49,8 @@ From `.env.garage` / `garage.toml`:
 ```bash
 brew install awscli
 
-export AWS_ACCESS_KEY_ID=GK9a14c600d85ff3bf96ce4f0d6d30b115
-export AWS_SECRET_ACCESS_KEY=6ab0baf787df18f75152bed0e808d9e5d80a43c4e6570fa3c2ec4cef6800ac5f
+export AWS_ACCESS_KEY_ID=<access-key-id>
+export AWS_SECRET_ACCESS_KEY=<secret-key>
 export AWS_DEFAULT_REGION=garage
 S3="aws --endpoint-url http://127.0.0.1:3900 s3"
 
@@ -59,8 +65,8 @@ $S3 sync ./dir s3://default-bucket/dir   # sync a directory
 ### curl (no install; uses SigV4 built into macOS curl)
 
 ```bash
-AK=GK9a14c600d85ff3bf96ce4f0d6d30b115
-SK=6ab0baf787df18f75152bed0e808d9e5d80a43c4e6570fa3c2ec4cef6800ac5f
+AK=<access-key-id>
+SK=<secret-key>
 SIG=(--aws-sigv4 aws:amz:garage:s3 --user "$AK:$SK")
 EP=http://127.0.0.1:3900
 
@@ -107,7 +113,7 @@ curl -H "Host: default-bucket.web.garage.localhost" http://127.0.0.1:3902/
 ## Admin API (port 3903)
 
 ```bash
-TOKEN=SKq4EDVBb+PZWnW96iFNwJZBMiP2V8n0tNWhGbjI+I8=
+TOKEN=<admin-token>
 H="Authorization: Bearer $TOKEN"
 A=http://127.0.0.1:3903/v2
 
